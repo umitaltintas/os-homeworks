@@ -8,6 +8,14 @@ void myos::Task::Yield()
 {
     asm volatile("int $0x20");
 }
+int myos::fork()
+{
+    int result;
+    asm volatile("int $0x80"
+                 : "=a"(result)
+                 : "a"(1));
+    return result;
+}
 
 Task::Task(GlobalDescriptorTable *gdt, void entrypoint())
 {

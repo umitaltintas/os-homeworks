@@ -1,5 +1,4 @@
 #include <syscalls.h>
-#include <string.h>
 using namespace myos;
 using namespace myos::common;
 using namespace myos::hardwarecommunication;

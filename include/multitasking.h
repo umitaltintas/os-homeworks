@@ -8,6 +8,7 @@
 using namespace myos::common;
 namespace myos
 {
+    int fork();
     enum TaskState
     {
         Running = 1,
