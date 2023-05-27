@@ -1,19 +1,27 @@
 #include "memory_manager.h"
 #include <iostream>
 #include <iostream>
+#include <cmath>
 
-int main()
+int main(int argc, char *argv[])
 {
-    MemoryManager memManager;
+    if (argc != 8)
+    {
+        std::cout << "Usage: operateArrays <frame size> <physical frames> <virtual frames> <algorithm> <table type> <disk file>\n";
+        std::cout << argc << std::endl;
+        return 1;
+    }
 
-    memManager.set(0, 12345);
-    memManager.set(5000, 12345);
+    // Parse command line arguments
+    int frameSize = std::pow(2, std::stoi(argv[1]));
+    int numPhysicalFrames = std::pow(2, std::stoi(argv[2]));
+    int numVirtualFrames = std::pow(2, std::stoi(argv[3]));
+    std::string algorithm = argv[4];
+    std::string tableType = argv[5];
+    std::string diskFile = argv[6];
 
-    int value0 = memManager.get(0);
-    int value5000 = memManager.get(5000);
+    // Pass these to your MemoryManager or appropriate object
+    MemoryManager memManager(frameSize, numPhysicalFrames, numVirtualFrames, algorithm, tableType, diskFile);
 
-    std::cout << "Value at virtual address 0: " << value0 << std::endl;
-    std::cout << "Value at virtual address 5000: " << value5000 << std::endl;
-
-    return 0;
+    // Proceed with your simulation here...
 }

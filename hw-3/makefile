@@ -43,4 +43,4 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 run: $(BUILD_DIR)/$(TARGET)
-	./$(BUILD_DIR)/$(TARGET) 
+	./$(BUILD_DIR)/$(TARGET) $(ARGS)

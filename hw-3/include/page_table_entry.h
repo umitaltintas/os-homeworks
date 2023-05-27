@@ -14,8 +14,11 @@ public:
     void markClean();
     void updateTimestamp();
     void updateLastUsed();
+    void setVirtualPageNumber(int number);
 
     unsigned int getFrameNumber() const;
+    void setFrameNumber(int framNumber);
+    int getVirtualPageNumber() const;
     bool isValid() const;
     bool isDirty() const;
     std::time_t getTimestamp() const;
@@ -23,6 +26,7 @@ public:
 
 private:
     unsigned int frameNumber;
+    int virtualPageNumber; // New field to store the virtual page number in this frame
     bool valid;
     bool dirty;
     std::time_t timestamp;
