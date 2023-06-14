@@ -1,46 +1,25 @@
-# Set the compiler
-UNAME := $(shell uname)
-ifeq ($(UNAME), Darwin)
-	CXX = clang++
-else
-	CXX = g++
-endif
+# Variables
+CXX=g++
+CXXFLAGS=-std=c++17 -I include
+TARGET1=fileSystemOperation
+TARGET2=makeFileSystem
+SOURCES1=src/fileSystemOperation.cpp src/FileSystem.cpp
+SOURCES2=src/makeFileSystem.cpp src/FileSystem.cpp
+OBJECTS1=$(SOURCES1:.cpp=.o)
+OBJECTS2=$(SOURCES2:.cpp=.o)
 
-# Set the C++ standard
-CXXFLAGS = -std=c++17 -Wall -Wextra -Wpedantic
+all: $(TARGET1) $(TARGET2)
 
-# Set the build directory
-BUILD_DIR = ./build
+$(TARGET1): $(OBJECTS1)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Set the source directory
-SRC_DIR = ./src
+$(TARGET2): $(OBJECTS2)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Set the include directory
-INC_DIR = ./include
-
-# Specify the target
-TARGET = memory_management
-
-# Specify the source files
-SRC = $(wildcard $(SRC_DIR)/*.cpp)
-
-# Specify the object files
-OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
-
-ifdef SHOW_MEMORY
-	CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
-endif
-
-$(BUILD_DIR)/$(TARGET): $(OBJ)
-	$(CXX) $^ -o $@ $(CXXFLAGS)
-
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	mkdir -p $(BUILD_DIR)
-	$(CXX) -c $< -o $@ $(CXXFLAGS) -I$(INC_DIR)
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 .PHONY: clean
-clean:
-	rm -rf $(BUILD_DIR)
 
-run: $(BUILD_DIR)/$(TARGET)
-	./$(BUILD_DIR)/$(TARGET) $(ARGS)
+clean:
+	rm -f src/*.o $(TARGET1) $(TARGET2)
