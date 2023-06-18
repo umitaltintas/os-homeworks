@@ -7,6 +7,11 @@
 #define FAT_SIZE (BLOCK_COUNT * sizeof(uint_12))
 
 
+dir_entry_t *fetch_parent_dir_entry(fat12_t *fs, char *path);
+
+
+char *get_parent_path(char *path);
+
 uint_12 *read_fat(FILE *file, boot_sector_t boot) {
     // Calculate FAT location
     int fat_start = sizeof(boot_sector_t);
@@ -146,15 +151,17 @@ void print_error_and_exit(std::string message) {
 }
 
 char **parse_path(char *path) {
+    char *path_copy = strdup(path); // Create a copy of path
     char **tokens = (char **) (malloc(sizeof(char *) * 10));
-    char *token = strtok(path, "/");
+    char *token = strtok(path_copy, "/");
     int i = 0;
-    while (token != nullptr) {
-        tokens[i] = token;
-        token = strtok(nullptr, "/");
+    while (token != NULL) {
+        tokens[i] = strdup(token); // Make a copy of the token
+        token = strtok(NULL, "/");
         i++;
     }
-    tokens[i] = nullptr;
+    tokens[i] = NULL;
+    free(path_copy); // Don't forget to free the copy of path
     return tokens;
 }
 
@@ -308,67 +315,90 @@ void list_dir(fat12_t *fs, char *path) {
 }
 
 void delete_dir(fat12_t *fs, char *path) {
-    // Fetch directory entry
     dir_entry_t *dir_entry = fetch_dir_entry_without_creation(fs, path);
     if (!dir_entry) {
         print_error_and_exit("Directory not found");
     }
-
-    // Check if the entry is a directory
     if ((dir_entry->attr & ATTR_DIRECTORY) == 0) {
         print_error_and_exit("Not a directory");
     }
-
-    // Read the directory
     dir_entry_t *current_dir = read_directory(fs, dir_entry->starting_cluster);
-
-    // Check if directory is empty
     for (int i = 1; i < fs->boot_sector.root_dir_entries_count; i++) {
         if (current_dir[i].filename[0] != '\0') {
             print_error_and_exit("Directory is not empty");
         }
     }
-
-    // Delete the directory entry itself
     current_dir->filename[0] = '\0';
     write_directory(fs->file, fs->boot_sector, current_dir->starting_cluster, current_dir);
 
-    // Free the cluster in FAT
-    uint_12 cluster = current_dir->starting_cluster;
+    // get parent dir_entry and remove directory entry
+    dir_entry_t *parent_dir_entry = fetch_parent_dir_entry(fs, path);
+    remove_entry_from_dir(fs, parent_dir_entry, dir_entry);
+
+    uint_12 cluster = dir_entry->starting_cluster;
     while (cluster.value != 0xFFF) {
         uint_12 next_cluster = fs->fat[cluster.value];
-        cluster.value = 0;
+        fs->fat[cluster.value].value = 0;
         cluster = next_cluster;
     }
-
-    // Write updated FAT and root directory to the disk
     write_fat(fs->file, fs->boot_sector, fs->fat);
     write_root_dir(fs->file, fs->boot_sector, fs->root_dir);
 }
 
-
 void delete_file(fat12_t *fs, char *path) {
-    // Similar to delete_dir, but also checks if the entry is a file
-
     dir_entry_t *dir_entry = fetch_dir_entry_without_creation(fs, path);
     if (!dir_entry) {
         print_error_and_exit("File not found");
     }
-
     if (dir_entry->attr != ATTR_FILE) {
         print_error_and_exit("Not a file");
     }
 
-    dir_entry->filename[0] = '\0';
+    // get parent dir_entry and remove file entry
+    dir_entry_t *parent_dir_entry = fetch_parent_dir_entry(fs, path);
+    remove_entry_from_dir(fs, parent_dir_entry, dir_entry);
+
     uint_12 cluster = dir_entry->starting_cluster;
     while (cluster.value != 0xFFF) {
         uint_12 next_cluster = fs->fat[cluster.value];
-        cluster.value = 0;
+        fs->fat[cluster.value].value = 0;
         cluster = next_cluster;
     }
     write_fat(fs->file, fs->boot_sector, fs->fat);
-
     write_directory(fs->file, fs->boot_sector, dir_entry->starting_cluster, dir_entry);
+}
+
+void remove_entry_from_dir(fat12_t *fs, dir_entry_t *entry, dir_entry_t *entry1) {
+    dir_entry_t *current_dir = read_directory(fs, entry->starting_cluster);
+    for (int i = 1; i < fs->boot_sector.root_dir_entries_count; i++) {
+        if (current_dir[i].filename[0] != '\0') {
+            if (strcmp((char *) current_dir[i].filename, (char *) entry1->filename) == 0) {
+                current_dir[i].filename[0] = '\0';
+                write_directory(fs->file, fs->boot_sector, current_dir->starting_cluster, current_dir);
+                return;
+            }
+        }
+    }
+    print_error_and_exit("File not found");
+}
+
+dir_entry_t *fetch_parent_dir_entry(fat12_t *fs, char *path) {
+    char *parent_path = get_parent_path(path);
+    dir_entry_t *parent_dir_entry = fetch_dir_entry_without_creation(fs, parent_path);
+    free(parent_path);
+    return parent_dir_entry;
+
+}
+
+char *get_parent_path(char *path) {
+    char *parent_path = strdup(path);
+    char *last_slash = strrchr(parent_path, '/');
+    if (last_slash) {
+        *last_slash = '\0';
+    } else {
+        print_error_and_exit("Invalid path");
+    }
+    return parent_path;
 }
 
 

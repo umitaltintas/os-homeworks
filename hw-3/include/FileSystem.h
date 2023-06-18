@@ -53,7 +53,6 @@ typedef struct {
 } fat12_t __attribute__((packed));
 
 
-
 void write_boot_sector(FILE *file, boot_sector_t boot);
 
 // Function declarations for FAT
@@ -101,6 +100,7 @@ char **parse_path(char *path);
 char *get_file_name(char *path);
 
 void add_entry_to_directory(fat12_t *fs, char *path, char *entry_name, uint8_t attr, void *data, size_t size);
+
 dir_entry_t *read_directory(fat12_t *fs, uint_12 cluster);
 
 uint_12 allocate_cluster(uint_12 *fat, int block_count);
@@ -108,5 +108,12 @@ uint_12 allocate_cluster(uint_12 *fat, int block_count);
 void write_directory(FILE *pFile, boot_sector_t sector, uint_12 cluster, dir_entry_t *dir);
 
 void *read_data_from_file(FILE *file, boot_sector_t boot_sector, uint_12 cluster, size_t size);
+
+void delete_entry_from_directory(fat12_t *fs, char *path);
+
+dir_entry_t *fetch_parent_dir_entry(fat12_t *fs, char *path);
+
+void remove_entry_from_dir(fat12_t *fs, dir_entry_t *entry, dir_entry_t *entry1);
+
 
 #endif // HW_3_FILESYSTEM_H
