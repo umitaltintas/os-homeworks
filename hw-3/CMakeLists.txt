@@ -18,3 +18,7 @@ add_executable(makeFileSystem
         ${PROJECT_SOURCE_DIR}/src/makeFileSystem.cpp
         ${PROJECT_SOURCE_DIR}/src/FileSystem.cpp
         )
+
+
+# do not ignore packed attribute warning
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-ignored-attributes")

@@ -3,8 +3,8 @@
 #include <thread>
 #include <future>
 #include "FileSystem.h"
-int main(int argc, char** argv) {
-    // Ensure the correct number of command-line arguments were provided.
+
+int main(int argc, char **argv) {
     if (argc != 3) {
         std::cerr << "Usage: " << argv[0] << " <block size in KB> <filename>\n";
         return 1;
@@ -18,11 +18,10 @@ int main(int argc, char** argv) {
     }
 
     // Get the filename.
-    std::string filename = argv[2];
+    char *filename = argv[2];
 
     // Create the file system.
-    FileSystem fileSystem(filename, blockSizeKB);
-    fileSystem.create();
+    create_filesystem(filename, blockSizeKB * 1024);
 
     return 0;
 }
