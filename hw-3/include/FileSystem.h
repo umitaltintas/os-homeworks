@@ -14,6 +14,7 @@
 #define ATTR_SYSTEM 0x04
 #define ATTR_VOLUME_ID 0x08
 #define ATTR_ARCHIVE 0x20
+#define ATTR_FILE 0x00
 
 
 #define BLOCK_COUNT 2880
@@ -51,8 +52,7 @@ typedef struct {
     dir_entry_t *root_dir;
 } fat12_t __attribute__((packed));
 
-// Function declarations for boot sector
-boot_sector_t read_boot_sector(FILE *file);
+
 
 void write_boot_sector(FILE *file, boot_sector_t boot);
 
@@ -69,7 +69,7 @@ void write_root_dir(FILE *file, boot_sector_t boot, dir_entry_t *dir);
 // Function declarations for file operations
 void create_file(fat12_t *fs, char *path);
 
-void read_file(fat12_t *fs, char *path);
+void read_file(fat12_t *fs, char *path, char *dest_path);
 
 void write_file(fat12_t *fs, char *path, void *data, size_t size);
 
@@ -84,21 +84,15 @@ void delete_dir(fat12_t *fs, char *path);
 
 void list_dir(fat12_t *fs, char *path);
 
-//read dir
-dir_entry_t *read_directory(fat12_t *fs, int address);
 
 // Function declarations for filesystem operations
 void create_filesystem(char *filename, size_t size);
 
 fat12_t *read_filesystem(char *filename);
 
+dir_entry_t *fetch_dir_entry_without_creation(fat12_t *fs, char *path);
 
-// Function declarations for utility functions
-
-void print_error(char *message);
-
-void print_error_and_exit(char *message);
-
+void dumpe2fs(fat12_t *fs);
 
 //parse path
 char **parse_path(char *path);

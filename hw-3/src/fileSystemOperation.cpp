@@ -48,10 +48,15 @@ int main(int argc, char **argv) {
 
 
     } else if (operation == "read") {
-
+        read_file(fileSystem, argv[3], argv[4]);
     } else if (operation == "del") {
-
+        delete_file(fileSystem, argv[3]);
 
     }
+    else if(operation=="dump2fs"){
+        dumpe2fs(fileSystem);
+    }
+
+
     return 0;
 }

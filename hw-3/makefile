@@ -1,25 +1,32 @@
 # Variables
-CXX=g++
-CXXFLAGS=-std=c++17 -I include
-TARGET1=fileSystemOperation
-TARGET2=makeFileSystem
-SOURCES1=src/fileSystemOperation.cpp src/FileSystem.cpp
-SOURCES2=src/makeFileSystem.cpp src/FileSystem.cpp
-OBJECTS1=$(SOURCES1:.cpp=.o)
-OBJECTS2=$(SOURCES2:.cpp=.o)
+CXX = g++
+CXXFLAGS = -std=c++17 -Wno-ignored-attributes
+INCLUDES = -I./include
+SOURCES_DIR = ./src
+BUILD_DIR = ./build
 
-all: $(TARGET1) $(TARGET2)
+# Required to create the build directory if it doesn't exist
+$(shell mkdir -p $(BUILD_DIR))
 
-$(TARGET1): $(OBJECTS1)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+# Executable 1: fileSystemOperation
+fileSystemOperation_SRC = $(SOURCES_DIR)/fileSystemOperation.cpp $(SOURCES_DIR)/FileSystem.cpp
+fileSystemOperation_OBJ = $(patsubst $(SOURCES_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(fileSystemOperation_SRC))
 
-$(TARGET2): $(OBJECTS2)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+fileSystemOperation: $(fileSystemOperation_OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(INCLUDES)
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# Executable 2: makeFileSystem
+makeFileSystem_SRC = $(SOURCES_DIR)/makeFileSystem.cpp $(SOURCES_DIR)/FileSystem.cpp
+makeFileSystem_OBJ = $(patsubst $(SOURCES_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(makeFileSystem_SRC))
 
+makeFileSystem: $(makeFileSystem_OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(INCLUDES)
+
+# Generic rule for turning .cpp into .o
+$(BUILD_DIR)/%.o: $(SOURCES_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDES)
+
+# Cleanup
 .PHONY: clean
-
 clean:
-	rm -f src/*.o $(TARGET1) $(TARGET2)
+	rm -f $(BUILD_DIR)/*.o fileSystemOperation makeFileSystem

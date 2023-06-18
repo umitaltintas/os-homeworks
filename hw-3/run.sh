@@ -1,24 +1,35 @@
 #!/bin/bash
 
-# Function to test the program with given parameters
-# Function to test the program with given parameters
-test_program() {
-    frame_size=$1
-    physical_frames=$2
-    virtual_frames=$3
-    algorithm=$4
-    table_type=$5
-    print_t=$6
-    disk_file=$7
+# Compile the C program
+ make fileSystemOperation
+ make makeFileSystem
 
-    echo "Testing with parameters: $frame_size $physical_frames $virtual_frames $algorithm $table_type $print_t $disk_file"
+# echo file
+echo "sourceFile" > sourceFile
 
-    ./build/memory_management $frame_size $physical_frames $virtual_frames $algorithm $table_type $print_t $disk_file
-}
+ #crate file system
+  ./makeFileSystem 2 fileSystem.data
 
-# Test cases
-test_program 12 5 10 WSC inverted 10000 diskFileName.dat
-test_program 10 3 7 SC flat 10000 anotherDiskFile.dat
+# Test 1: dir command
+./fileSystemOperation fileSystem.data dir "/"
 
-# Add more test cases as needed
-aw
+# Test 2: mkdir command
+./fileSystemOperation fileSystem.data mkdir "/ysa/fname"
+
+# Test 3: rmdir command
+./fileSystemOperation fileSystem.data rmdir "/ysa/fname"
+
+# Test 4: dumpe2fs command
+./fileSystemOperation fileSystem.data dump2fs
+
+# Test 5: write command
+./fileSystemOperation fileSystem.data write "/ysa/file" "sourceFile"
+
+# Test 6: read command
+./fileSystemOperation fileSystem.data read "/ysa/file" "targetFile"
+
+# Test 7: del command
+./fileSystemOperation fileSystem.data del "/ysa/file"
+
+# Clean up - remove the compiled program
+rm fileSystemOperation
