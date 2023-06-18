@@ -20,15 +20,32 @@ int main(int argc, char **argv) {
 
     if (operation == "dir") {
         list_dir(fileSystem, argv[3]);
-    } else if (operation == "create") {
     } else if (operation == "mkdir") {
         fetch_dir_entry(fileSystem, argv[3]);
-
     } else if (operation == "rmdir") {
-
+        delete_dir(fileSystem, argv[3]);
     } else if (operation == "dumpe2fs") {
 
     } else if (operation == "write") {
+        char *sourceFileName = argv[4];
+        //fileSystem.data write “\ysa\file” linuxFile  // this should copy content of linuxFile to file in the file system
+        FILE *linuxFile = fopen(sourceFileName, "r");
+        if (linuxFile == nullptr) {
+            std::cerr << "Error: " << std::string(sourceFileName) << " not found" << std::endl;
+            return 1;
+        }
+
+        char *content = nullptr;
+        size_t size = 0;
+        fseek(linuxFile, 0, SEEK_END);
+        size = ftell(linuxFile);
+        fseek(linuxFile, 0, SEEK_SET);
+        content = (char *) malloc(size);
+        fread(content, 1, size, linuxFile);
+        fclose(linuxFile);
+
+        write_file(fileSystem, argv[3], content, size);
+
 
     } else if (operation == "read") {
 
