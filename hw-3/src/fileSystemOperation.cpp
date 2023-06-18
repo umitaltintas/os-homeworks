@@ -1,8 +1,7 @@
 #include <iostream>
 #include "FileSystem.h"
 
-#include <unordered_map>
-#include <functional>
+
 
 
 int main(int argc, char **argv) {
@@ -28,7 +27,6 @@ int main(int argc, char **argv) {
 
     } else if (operation == "write") {
         char *sourceFileName = argv[4];
-        //fileSystem.data write “\ysa\file” linuxFile  // this should copy content of linuxFile to file in the file system
         FILE *linuxFile = fopen(sourceFileName, "r");
         if (linuxFile == nullptr) {
             std::cerr << "Error: " << std::string(sourceFileName) << " not found" << std::endl;

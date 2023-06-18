@@ -151,17 +151,17 @@ void print_error_and_exit(std::string message) {
 }
 
 char **parse_path(char *path) {
-    char *path_copy = strdup(path); // Create a copy of path
+    char *path_copy = strdup(path);
     char **tokens = (char **) (malloc(sizeof(char *) * 10));
     char *token = strtok(path_copy, "/");
     int i = 0;
     while (token != NULL) {
-        tokens[i] = strdup(token); // Make a copy of the token
+        tokens[i] = strdup(token);
         token = strtok(NULL, "/");
         i++;
     }
     tokens[i] = NULL;
-    free(path_copy); // Don't forget to free the copy of path
+    free(path_copy);
     return tokens;
 }
 
@@ -191,9 +191,9 @@ dir_entry_t *fetch_dir_entry(fat12_t *fs, char *path) {
         if (!found) {
             current_dir = read_directory(fs, current_dir->starting_cluster);
             create_dir(fs, tokens[i], current_dir);
-            dir_entry = &current_dir[1];  // Use the newly created directory
+            dir_entry = &current_dir[1];
             current_dir = read_directory(fs,
-                                         dir_entry->starting_cluster);  // Refresh current_dir to reflect newly created directory
+                                         dir_entry->starting_cluster);
         }
         i++;
     }
