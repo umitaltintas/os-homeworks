@@ -36,8 +36,8 @@ typedef struct {
     unsigned char filename[8];
     unsigned char ext[3];
     unsigned char attr;
-    uint_12 time;
-    uint_12 date;
+    unsigned short time;
+    unsigned short date;
     uint_12 starting_cluster;
     unsigned int file_size;
 } dir_entry_t __attribute__((packed));
@@ -106,7 +106,7 @@ char **parse_path(char *path);
 //get file name from path
 char *get_file_name(char *path);
 
-
+void add_entry_to_directory(fat12_t *fs, char *path, char *entry_name, uint8_t attr, void *data, size_t size);
 dir_entry_t *read_directory(fat12_t *fs, uint_12 cluster);
 
 uint_12 allocate_cluster(uint_12 *fat, int block_count);
